@@ -12,7 +12,7 @@ public class SalesController(ISalesService salesService) : ControllerBase
     private readonly ISalesService _salesService = salesService;
 
     [HttpGet]
-    public ActionResult<List<Sales>> GetAllSales(PaginationParameters param)
+    public ActionResult<List<Sales>> GetAllSales([FromQuery]PaginationParameters param)
     {
         var sales = _salesService.GetAllSalesAsync().Result;
 
