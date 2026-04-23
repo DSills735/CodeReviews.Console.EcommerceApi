@@ -14,8 +14,6 @@ internal class ProductsController
         string ProductDescription = AnsiConsole.Ask<string>("Enter the description of the product:");
         decimal ProductPrice = AnsiConsole.Ask<decimal>("Enter the price of the product:");
         int ProductQuantity = AnsiConsole.Ask<int>("Enter the quantity in stock for the product:");
-        //Add category list to assign category to the product?? 
-
 
         Product product = new Product
         {
@@ -24,11 +22,6 @@ internal class ProductsController
             Price = ProductPrice,
             QuantityInStock = ProductQuantity
         };
-
-        //TODO call product service to finalize addition
-
-        await ProductService.AddProduct(product);
-
-
+         ProductService.AddProduct(product);
     }
 }
