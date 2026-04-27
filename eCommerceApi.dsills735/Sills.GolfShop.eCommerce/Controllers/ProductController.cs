@@ -14,16 +14,16 @@ public class ProductController(IProductsService productsService) : ControllerBas
     private readonly IProductsService _productService = productsService;
 
     [HttpGet]
-    public ActionResult<List<Product>> GetAllProducts([FromQuery]PaginationParameters param)
+    public async Task<ActionResult<List<Product>>> GetAllProducts([FromQuery]PaginationParameters param)
     {
-        var products = _productService.GetAllProductsAsync().Result;
+        var products = await _productService.GetAllProductsAsync();
         
         var pagedProducts = products
             .Skip((param.PageNumber - 1) * param.PageSize)
             .Take(param.PageSize)
             .ToList();
         
-        return Ok(products);
+        return Ok(pagedProducts);
     }
 
         [HttpGet("{id}")]
@@ -46,7 +46,7 @@ public class ProductController(IProductsService productsService) : ControllerBas
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateProduct(int id, ProductUpdateDto productUpdateDto)
     {
-        var existingProduct = _productService.GetProductByIdAsync(id).Result;
+        var existingProduct = await _productService.GetProductByIdAsync(id);
         if (existingProduct == null)
         {
             return NotFound();
@@ -60,14 +60,14 @@ public class ProductController(IProductsService productsService) : ControllerBas
     }
 
     [HttpDelete("{id}")]
-    public IActionResult DeleteProduct(int id)
+    public async Task<IActionResult> DeleteProduct(int id)
     {
-        var existingProduct = _productService.GetProductByIdAsync(id).Result;
+        var existingProduct = await _productService.GetProductByIdAsync(id);
         if (existingProduct == null)
         {
             return NotFound();
         }
-        _productService.DeleteProductAsync(id).Wait();
+        await _productService.DeleteProductAsync(id);
 
         return NoContent();
     }

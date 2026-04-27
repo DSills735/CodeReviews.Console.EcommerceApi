@@ -6,7 +6,7 @@ namespace Sills.GolfShop.eCommerceFrontEnd.Controllers;
 
 internal class ProductsController
 {
-    internal void AddProduct()
+    internal async Task AddProduct()
     {
         Console.Clear();
 
@@ -22,6 +22,6 @@ internal class ProductsController
             Price = ProductPrice,
             QuantityInStock = ProductQuantity
         };
-         ProductService.AddProduct(product);
+         await ProductService.AddProduct(product);
     }
 }

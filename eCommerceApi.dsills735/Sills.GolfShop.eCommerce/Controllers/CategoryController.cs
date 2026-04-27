@@ -29,19 +29,13 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
                    .Take(param.PageSize)
                    .ToListAsync();
 
-            query = categoryParams.sortBy switch
-            { 
-                "name_desc" => query.OrderByDescending(p => p.Name),
-                _ => query.OrderBy(p => p.Name)
-            };
-
             return Ok(pagedCategories);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Categories> GetCategoryById(int id)
+        public async Task<ActionResult<Categories>> GetCategoryById(int id)
         {
-            var category = _categoryService.GetCategoryByIdAsync(id);
+            var category = await _categoryService.GetCategoryByIdAsync(id);
             if (category == null)
             {
                 return NotFound();
@@ -50,32 +44,32 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
         }
 
         [HttpPost]
-        public ActionResult<Categories> CreateCategory(Categories category)
+        public async Task<ActionResult<Categories>> CreateCategory(Categories category)
         {
-            var createdCategory = _categoryService.CreateCategoryAsync(category);
+            var createdCategory = await _categoryService.CreateCategoryAsync(category);
             return CreatedAtAction(nameof(GetCategoryById), new { id = createdCategory.Id }, createdCategory);
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateCategory(int id, Categories category)
+        public async Task<IActionResult> UpdateCategory(int id, Categories category)
         {
-            var existingCategory = _categoryService.GetCategoryByIdAsync(id);
+            var existingCategory = await _categoryService.GetCategoryByIdAsync(id);
             if (existingCategory == null)
             {
                 return NotFound();
             }
-            _categoryService.UpdateCategoryAsync(id, category);
+            await _categoryService.UpdateCategoryAsync(id, category);
             return NoContent();
         }
         [HttpDelete("{id}")]
-        public IActionResult DeleteCategory(int id)
+        public async Task<IActionResult> DeleteCategory(int id)
         {
-            var existingCategory = _categoryService.GetCategoryByIdAsync(id);
+            var existingCategory = await _categoryService.GetCategoryByIdAsync(id);
             if (existingCategory == null)
             {
                 return NotFound();
             }
-            _categoryService.DeleteCategoryAsync(id);
+            await _categoryService.DeleteCategoryAsync(id);
             return NoContent();
         }
 

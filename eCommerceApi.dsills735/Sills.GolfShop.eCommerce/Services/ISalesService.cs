@@ -6,13 +6,12 @@ namespace Sills.GolfShop.eCommerceAPI.Services;
 
 public interface ISalesService
 {
-    Task<List<Sales>> GetAllSalesAsync();
+    //Task<List<Sales>> GetAllSalesAsync();
     Task<Sales> GetSaleByIdAsync(int id);
     Task<Sales> CreateSaleAsync(Sales sale);
     Task DeleteSaleAsync(int id);
     Task UpdateSaleAsync(int id, Sales sale);
-
-
+    Task<List<Sales>> GetPagedSalesAsync(int pageNumber, int pageSize);
 }
 public class SalesService : ISalesService
 {
@@ -23,10 +22,12 @@ public class SalesService : ISalesService
         _context = context;
     }
 
+    /*
     public async Task<List<Sales>> GetAllSalesAsync()
     {
         return await _context.Sales.ToListAsync();
     }
+    */
     public async Task<Sales> GetSaleByIdAsync(int id)
     {
         return await _context.Sales.FindAsync(id);
@@ -85,6 +86,15 @@ public class SalesService : ISalesService
         }
         _context.ProductSales.Remove(productSale);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<List<Sales>> GetPagedSalesAsync(int pageNumber, int pageSize)
+    {
+        return await _context.Sales
+            .OrderBy(s => s.Id)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
     }
 
 }

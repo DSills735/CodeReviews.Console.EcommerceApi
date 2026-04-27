@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi;
 using Sills.GolfShop.eCommerceAPI.Data;
 using Sills.GolfShop.eCommerceAPI.Services;
 
@@ -13,14 +14,15 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductsService, ProductsService>();
 builder.Services.AddScoped<ISalesService, SalesService>();
 
-builder.WebHost.UseUrls("http://localhost:8080");
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-
+    var dbContext = app.Services.GetRequiredService<GolfShopDbContext>();
+    dbContext.Database.EnsureDeleted();
+    dbContext.Database.EnsureCreated();
 }
 
 app.MapControllers();

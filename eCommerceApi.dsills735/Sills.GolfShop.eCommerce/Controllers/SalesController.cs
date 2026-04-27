@@ -12,55 +12,51 @@ public class SalesController(ISalesService salesService) : ControllerBase
     private readonly ISalesService _salesService = salesService;
 
     [HttpGet]
-    public ActionResult<List<Sales>> GetAllSales([FromQuery]PaginationParameters param)
+    public async Task<ActionResult<List<Sales>>> GetAllSales([FromQuery] PaginationParameters param)
     {
-        var sales = _salesService.GetAllSalesAsync().Result;
+        var pagedSales = await _salesService
+            .GetPagedSalesAsync(param.PageNumber, param.PageSize);
 
-        var pagedSales = sales
-               .Skip((param.PageNumber - 1) * param.PageSize)
-               .Take(param.PageSize)
-               .ToList();
-
-            return Ok(sales);
-        }
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Sales>> GetSaleById(int id)
-        {
-            var sale = await _salesService.GetSaleByIdAsync(id);
-            if (sale == null)
-            {
-                return NotFound();
-            }
-            return Ok(sale);
-        }
-        [HttpPost]
-        public async Task<ActionResult<Sales>> CreateSale(Sales sale)
-        {
-            var createdSale = await _salesService.CreateSaleAsync(sale);
-            return CreatedAtAction(nameof(GetSaleById), new { id = createdSale.Id }, createdSale);
-        }
-        [HttpPut("{id}")]
-        public IActionResult UpdateSale(int id, Sales sale)
-        {
-            var existingSale = _salesService.GetSaleByIdAsync(id).Result;
-            if (existingSale == null)
-            {
-                return NotFound();
-            }
-            _salesService.UpdateSaleAsync(id, sale).Wait();
-            return NoContent();
-        }
-        
-        [HttpDelete("{id}")]
-                public IActionResult DeleteSale(int id)
-        {
-            var existingSale = _salesService.GetSaleByIdAsync(id).Result;
-            if (existingSale == null)
-            {
-                return NotFound();
-            }
-            _salesService.DeleteSaleAsync(id).Wait();
-            return NoContent();
-        }
-        
+        return Ok(pagedSales);
     }
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Sales>> GetSaleById(int id)
+    {
+        var sale = await _salesService.GetSaleByIdAsync(id);
+        if (sale == null)
+        {
+            return NotFound();
+        }
+        return Ok(sale);
+    }
+    [HttpPost]
+    public async Task<ActionResult<Sales>> CreateSale(Sales sale)
+    {
+        var createdSale = await _salesService.CreateSaleAsync(sale);
+        return CreatedAtAction(nameof(GetSaleById), new { id = createdSale.Id }, createdSale);
+    }
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateSale(int id, Sales sale)
+    {
+        var existingSale = await _salesService.GetSaleByIdAsync(id);
+        if (existingSale == null)
+        {
+            return NotFound();
+        }
+        await _salesService.UpdateSaleAsync(id, sale);
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteSale(int id)
+    {
+        var existingSale = await _salesService.GetSaleByIdAsync(id);
+        if (existingSale == null)
+        {
+            return NotFound();
+        }
+        await _salesService.DeleteSaleAsync(id);
+        return NoContent();
+    }
+
+}
